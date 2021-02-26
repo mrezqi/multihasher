@@ -19,8 +19,12 @@ srcdir = sys.argv[1]
 with open('checksums.tsv', 'w') as f:
     writer = csv.writer(f, delimiter='\t', quotechar='"', quoting=csv.QUOTE_MINIMAL)
     for directory, filename, path in recursive_file_listing(srcdir):
-        try:
-            writer.writerow((directory, filename, file_hash_hex(path, hashlib.md5), file_hash_hex(path, hashlib.sha1), file_hash_hex(path, hashlib.sha256), file_hash_hex(path, hashlib.sha512)))
-        except Exception:
-            print("error on " + directory + " " + filename)
-            pass
+        if (not os.path.isfile(path)):
+            print( path + " is not file, skipping")
+            continue
+        else:
+            try:
+                writer.writerow((directory + "/" + filename, file_hash_hex(path, hashlib.md5), file_hash_hex(path, hashlib.sha1), file_hash_hex(path, hashlib.sha256), file_hash_hex(path, hashlib.sha512)))
+            except:
+                print("error on " + directory + "/" + filename + ", skipping")
+                continue
